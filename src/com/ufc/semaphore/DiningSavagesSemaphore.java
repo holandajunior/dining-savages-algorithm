@@ -4,6 +4,8 @@ import com.ufc.InfoUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 public class DiningSavagesSemaphore {
@@ -36,17 +38,16 @@ public class DiningSavagesSemaphore {
         DiningSavagesSemaphore coordinator = new DiningSavagesSemaphore( 5 );
 
         // Create all savage threads
-        List<Runnable> savages = new ArrayList<>( NUMBER_SAVAGES );
+        ExecutorService savagePool = Executors.newFixedThreadPool( DiningSavagesSemaphore.NUMBER_SAVAGES );
         for( int savage = 0; savage < NUMBER_SAVAGES; savage++ ) {
 
-            Thread thread = new Thread( new Savage( coordinator.getMutex() ) );
-            savages.add( thread );
-            thread.start();
+            savagePool.submit( new Savage( coordinator.getMutex() ) );
 
         }
 
         //Create cook thread
-
+        ExecutorService cookPool = Executors.newSingleThreadExecutor();
+        cookPool.submit( new Cook() );
 
     }
 }
