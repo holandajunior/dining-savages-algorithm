@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-public class DiningSavagesSemaphore {
+public class DiningSavagesMonitor {
 
     private Semaphore mutex;
     private Semaphore emptyPot;
@@ -13,7 +13,7 @@ public class DiningSavagesSemaphore {
     private final int potCapacity;
     private int stewedInPot;
 
-    public DiningSavagesSemaphore( int potCapacity ) {
+    public DiningSavagesMonitor(int potCapacity ) {
 
         mutex = new Semaphore( 1 );
         emptyPot = new Semaphore(0);
@@ -58,7 +58,7 @@ public class DiningSavagesSemaphore {
         int numberSavages = Integer.valueOf( args[0] );
         int potCapacity = Integer.valueOf( args[1] );
 
-        DiningSavagesSemaphore coordinator = new DiningSavagesSemaphore( potCapacity );
+        DiningSavagesMonitor coordinator = new DiningSavagesMonitor( potCapacity );
 
         // Create all savage threads
         ExecutorService savagePool = Executors.newFixedThreadPool( numberSavages );
