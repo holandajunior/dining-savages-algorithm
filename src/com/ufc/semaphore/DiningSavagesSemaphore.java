@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-public class DiningSavagesMonitor {
+public class DiningSavagesSemaphore {
 
     private Semaphore mutex;
     private Semaphore emptyPot;
@@ -13,7 +13,7 @@ public class DiningSavagesMonitor {
     private final int potCapacity;
     private int stewedInPot;
 
-    public DiningSavagesMonitor(int potCapacity ) {
+    public DiningSavagesSemaphore(int potCapacity ) {
 
         mutex = new Semaphore( 1 );
         emptyPot = new Semaphore(0);
@@ -21,6 +21,8 @@ public class DiningSavagesMonitor {
 
         this.potCapacity = potCapacity;
         this.stewedInPot = potCapacity;
+
+        System.out.println( "Method: using Semaphore" );
     }
 
     public int getStewedInPot() {
@@ -49,36 +51,28 @@ public class DiningSavagesMonitor {
         return fullPot;
     }
 
-    /**
-     *
-     * @param args [0] -> Number of savage threads; [1] -> Pot capacity
-     */
-    public static void main(String[] args) {
+    public void start( int numberSavages ) {
 
-        int numberSavages = Integer.valueOf( args[0] );
-        int potCapacity = Integer.valueOf( args[1] );
-
-        DiningSavagesMonitor coordinator = new DiningSavagesMonitor( potCapacity );
 
         // Create all savage threads
         ExecutorService savagePool = Executors.newFixedThreadPool( numberSavages );
         for( int savage = 0; savage < numberSavages; savage++ ) {
 
             savagePool.submit( new Savage( savage,
-                                           coordinator,
-                                           coordinator.getMutex(),
-                                           coordinator.getEmptyPot(),
-                                           coordinator.getFullPot() ) );
+                                           this,
+                                           this.getMutex(),
+                                           this.getEmptyPot(),
+                                           this.getFullPot() ) );
 
         }
 
 
         //Create cook thread
         ExecutorService cookPool = Executors.newSingleThreadExecutor();
-        cookPool.submit( new Cook( coordinator,
-                                   coordinator.getMutex(),
-                                   coordinator.getEmptyPot(),
-                                   coordinator.getFullPot() ) );
+        cookPool.submit( new Cook( this,
+                                   this.getMutex(),
+                                   this.getEmptyPot(),
+                                   this.getFullPot() ) );
 
     }
 }
